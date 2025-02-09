@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,6 +45,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html>
       <body className={inter.className}>{children}</body>
+      <GoogleAnalytics
+        gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ""}
+      />
     </html>
   );
 };
