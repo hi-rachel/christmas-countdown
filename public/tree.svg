@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Tree -->
+  <path d="M50 10 L80 80 L20 80 Z" fill="#2F5C24"/>
+  <!-- Tree Trunk -->
+  <rect x="45" y="80" width="10" height="15" fill="#8B4513"/>
+  <!-- Decorations -->
+  <circle cx="50" cy="30" r="4" fill="#FFD700"/>
+  <circle cx="40" cy="50" r="4" fill="#FF0000"/>
+  <circle cx="60" cy="50" r="4" fill="#FFD700"/>
+  <circle cx="45" cy="65" r="4" fill="#FF0000"/>
+  <circle cx="55" cy="65" r="4" fill="#FFD700"/>
+</svg>
