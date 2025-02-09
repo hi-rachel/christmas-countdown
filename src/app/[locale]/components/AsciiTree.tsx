@@ -1,6 +1,11 @@
-import React from "react";
+import React, { ReactNode, ReactElement } from "react";
 
-const Tree = ({ height = 20, width = "w-72", className = "" }) => {
+interface TreeProps {
+  height?: number;
+  width?: string;
+}
+
+const Tree: React.FC<TreeProps> = ({ height = 20, width = "w-72" }) => {
   const ornaments = ["●", "○", "◆", "♥", "✦", "❆", "◉"];
   const colors = [
     "text-red-400",
@@ -11,28 +16,30 @@ const Tree = ({ height = 20, width = "w-72", className = "" }) => {
     "text-cyan-400",
   ];
 
-  const renderLine = (content, extraClass = "") => (
+  const renderLine = (content: ReactNode, extraClass = ""): ReactElement => (
     <div className={`text-center w-full ${extraClass}`}>{content}</div>
   );
 
-  const renderTree = () => {
-    const tree = [];
+  const renderTree = (): ReactElement[] => {
+    const tree: ReactElement[] = [];
 
-    // 별
+    // Star
     tree.push(
       renderLine(
-        <span className="text-yellow-300 animate-pulse font-bold text-xl inline-block">
+        <span
+          key="star"
+          className="text-yellow-300 animate-pulse font-bold text-xl inline-block"
+        >
           ⭐
         </span>,
         "mb-1"
       )
     );
 
-    // 트리 바디 - 더 삼각형에 가깝게 조정
+    // Tree body
     for (let i = 0; i < height; i++) {
-      const lineContent = [];
-      // 라인 너비를 조절하여 더 삼각형에 가깝게 만듦
-      const lineWidth = Math.floor(1.8 * i + 1);
+      const lineContent: ReactElement[] = [];
+      const lineWidth = Math.floor(1.7 * i + 1);
 
       for (let j = 0; j < lineWidth; j++) {
         if (Math.random() < 0.15) {
@@ -40,13 +47,16 @@ const Tree = ({ height = 20, width = "w-72", className = "" }) => {
             ornaments[Math.floor(Math.random() * ornaments.length)];
           const color = colors[Math.floor(Math.random() * colors.length)];
           lineContent.push(
-            <span key={j} className={`${color} animate-pulse`}>
+            <span
+              key={`ornament-${i}-${j}`}
+              className={`${color} animate-pulse`}
+            >
               {ornament}
             </span>
           );
         } else {
           lineContent.push(
-            <span key={j} className="text-emerald-400">
+            <span key={`branch-${i}-${j}`} className="text-emerald-400">
               {i % 2 === 0 ? "✧" : "*"}
             </span>
           );
@@ -56,6 +66,7 @@ const Tree = ({ height = 20, width = "w-72", className = "" }) => {
       tree.push(
         renderLine(
           <div
+            key={`line-${i}`}
             className="inline-block font-bold"
             style={{ textShadow: "0 0 8px rgba(52, 211, 153, 0.8)" }}
           >
@@ -65,12 +76,13 @@ const Tree = ({ height = 20, width = "w-72", className = "" }) => {
       );
     }
 
-    // 나무 기둥
+    // Tree trunk
     const trunk = ["┏━━━┓", "┃███┃"];
-    trunk.forEach((line) => {
+    trunk.forEach((line, index) => {
       tree.push(
         renderLine(
           <span
+            key={`trunk-${index}`}
             className="text-yellow-800 font-bold inline-block"
             style={{ textShadow: "0 0 5px rgba(146, 64, 14, 0.8)" }}
           >
@@ -84,29 +96,24 @@ const Tree = ({ height = 20, width = "w-72", className = "" }) => {
   };
 
   return (
-    <div
-      className={`font-mono text-sm md:text-base select-none ${width} ${className}`}
-    >
+    <div className={`font-mono text-sm md:text-base select-none ${width}`}>
       {renderTree()}
     </div>
   );
 };
 
-const TreesBackground = () => {
+const TreesBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {/* 왼쪽 트리 (작은 크기) */}
-      <div className="fixed bottom-0 left-8">
+      <div className="fixed bottom-0 left-16 hidden md:block">
         <Tree height={15} width="w-56" />
       </div>
 
-      {/* 중앙 트리 */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2">
-        <Tree height={20} width="w-80" />
+        <Tree height={20} width="w-72 md:w-80" />
       </div>
 
-      {/* 오른쪽 트리 */}
-      <div className="fixed bottom-0 right-8">
+      <div className="fixed bottom-0 right-16 hidden md:block">
         <Tree height={15} width="w-56" />
       </div>
     </div>
