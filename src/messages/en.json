@@ -1,0 +1,63 @@
+{
+  "main": {
+    "title": "Christmas Countdown",
+    "nameInput": {
+      "placeholder": "Enter your name",
+      "submit": "Submit"
+    },
+    "countdown": {
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds",
+      "userPrefix": "{name}'s "
+    },
+    "share": {
+      "button": "Share",
+      "text": "{name}'s Time until Christmas: {days} days {hours} hours",
+      "copied": "Link copied!"
+    }
+  },
+  "quotes": [
+    {
+      "text": "The magic of Christmas is in the hearts of us all.",
+      "author": "Calvin Coolidge"
+    },
+    {
+      "text": "Christmas is joy found in giving, not in receiving.",
+      "author": "Norman Vincent Peale"
+    },
+    {
+      "text": "The joy of Christmas is not in the presents but in our hearts.",
+      "author": "W.T. Ellis"
+    },
+    {
+      "text": "Christmas is the moment when hope and love come together.",
+      "author": "Unknown"
+    },
+    {
+      "text": "Wouldn't it be wonderful if every day were Christmas?",
+      "author": "Charles Dickens"
+    },
+    {
+      "text": "Christmas isn't a season. It's a feeling.",
+      "author": "Edna Ferber"
+    },
+    {
+      "text": "Christmas is the day that holds all time together.",
+      "author": "Alexander Smith"
+    },
+    {
+      "text": "The best way to spread Christmas cheer is singing loud for all to hear.",
+      "author": "Buddy the Elf (Movie 'Elf')"
+    },
+    {
+      "text": "Love the giver more than the gift.",
+      "author": "Brigham Young"
+    },
+    {
+      "text": "Peace on earth will come to stay, when we live Christmas every day.",
+      "author": "Helen Steiner Rice"
+    }
+  ]
+}
