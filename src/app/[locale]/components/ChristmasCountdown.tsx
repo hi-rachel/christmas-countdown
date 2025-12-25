@@ -13,6 +13,14 @@ const timeZoneMap: Record<string, string> = {
   en: "America/New_York", // 미국 동부 (UTC-5/-4, 서머타임 고려)
 };
 
+// 안전하게 DateTimeFormatPart에서 값 추출하는 헬퍼 함수
+const getPartValue = (
+  parts: Intl.DateTimeFormatPart[],
+  type: string
+): string => {
+  return parts.find((p) => p.type === type)?.value ?? "0";
+};
+
 const ChristmasCountdown = () => {
   const t = useTranslations("main");
   const router = useRouter();
@@ -46,24 +54,12 @@ const ChristmasCountdown = () => {
       });
 
       const dateParts = formatter.formatToParts(now);
-      const currentYear = parseInt(
-        dateParts.find((p) => p.type === "year")!.value
-      );
-      const currentMonth = parseInt(
-        dateParts.find((p) => p.type === "month")!.value
-      );
-      const currentDate = parseInt(
-        dateParts.find((p) => p.type === "day")!.value
-      );
-      const currentHour = parseInt(
-        dateParts.find((p) => p.type === "hour")!.value
-      );
-      const currentMinute = parseInt(
-        dateParts.find((p) => p.type === "minute")!.value
-      );
-      const currentSecond = parseInt(
-        dateParts.find((p) => p.type === "second")!.value
-      );
+      const currentYear = parseInt(getPartValue(dateParts, "year"));
+      const currentMonth = parseInt(getPartValue(dateParts, "month"));
+      const currentDate = parseInt(getPartValue(dateParts, "day"));
+      const currentHour = parseInt(getPartValue(dateParts, "hour"));
+      const currentMinute = parseInt(getPartValue(dateParts, "minute"));
+      const currentSecond = parseInt(getPartValue(dateParts, "second"));
 
       // 크리스마스 날짜인지 확인 (12월 25일)
       if (currentMonth === 12 && currentDate === 25) {
@@ -114,16 +110,12 @@ const ChristmasCountdown = () => {
         });
 
         const parts = formatter.formatToParts(utcDate);
-        const tzYear = parseInt(parts.find((p) => p.type === "year")!.value);
-        const tzMonth = parseInt(parts.find((p) => p.type === "month")!.value);
-        const tzDay = parseInt(parts.find((p) => p.type === "day")!.value);
-        const tzHour = parseInt(parts.find((p) => p.type === "hour")!.value);
-        const tzMinute = parseInt(
-          parts.find((p) => p.type === "minute")!.value
-        );
-        const tzSecond = parseInt(
-          parts.find((p) => p.type === "second")!.value
-        );
+        const tzYear = parseInt(getPartValue(parts, "year"));
+        const tzMonth = parseInt(getPartValue(parts, "month"));
+        const tzDay = parseInt(getPartValue(parts, "day"));
+        const tzHour = parseInt(getPartValue(parts, "hour"));
+        const tzMinute = parseInt(getPartValue(parts, "minute"));
+        const tzSecond = parseInt(getPartValue(parts, "second"));
 
         // 해당 시간대에서 표시된 시간을 UTC로 변환
         const tzUTC = Date.UTC(
