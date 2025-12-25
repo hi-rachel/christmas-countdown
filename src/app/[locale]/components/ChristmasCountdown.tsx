@@ -5,6 +5,14 @@ import { Share2, Edit2, Globe } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 
+// 각 언어에 맞는 시간대 매핑
+const timeZoneMap: Record<string, string> = {
+  ko: "Asia/Seoul", // 한국 (UTC+9)
+  ja: "Asia/Tokyo", // 일본 (UTC+9)
+  zh: "Asia/Shanghai", // 중국 (UTC+8)
+  en: "America/New_York", // 미국 동부 (UTC-5/-4, 서머타임 고려)
+};
+
 const ChristmasCountdown = () => {
   const t = useTranslations("main");
   const router = useRouter();
@@ -16,20 +24,147 @@ const ChristmasCountdown = () => {
     minutes: 0,
     seconds: 0,
   });
+  const [isDday, setIsDday] = useState(false);
   const [userName, setUserName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now: Date = new Date();
-      const christmas: Date = new Date(now.getFullYear(), 11, 25);
-      christmas.setHours(0, 0, 0, 0);
+      const timeZone = timeZoneMap[locale] || "Asia/Seoul"; // 기본값은 한국 시간
 
-      if (now > christmas) {
-        christmas.setFullYear(christmas.getFullYear() + 1);
+      // 선택된 언어의 시간대 기준으로 현재 날짜 가져오기
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: timeZone,
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      });
+
+      const dateParts = formatter.formatToParts(now);
+      const currentYear = parseInt(
+        dateParts.find((p) => p.type === "year")!.value
+      );
+      const currentMonth = parseInt(
+        dateParts.find((p) => p.type === "month")!.value
+      );
+      const currentDate = parseInt(
+        dateParts.find((p) => p.type === "day")!.value
+      );
+      const currentHour = parseInt(
+        dateParts.find((p) => p.type === "hour")!.value
+      );
+      const currentMinute = parseInt(
+        dateParts.find((p) => p.type === "minute")!.value
+      );
+      const currentSecond = parseInt(
+        dateParts.find((p) => p.type === "second")!.value
+      );
+
+      // 크리스마스 날짜인지 확인 (12월 25일)
+      if (currentMonth === 12 && currentDate === 25) {
+        setIsDday(true);
+        setTimeLeft({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+        return;
       }
 
-      const difference: number = christmas.getTime() - now.getTime();
+      setIsDday(false);
+
+      // 크리스마스 날짜 결정 (이미 지났으면 다음 해)
+      let christmasYear = currentYear;
+      if (currentMonth === 12 && currentDate > 25) {
+        christmasYear = currentYear + 1;
+      } else if (currentMonth > 12) {
+        christmasYear = currentYear + 1;
+      }
+
+      // 해당 시간대의 특정 시간을 UTC 밀리초로 변환하는 헬퍼 함수
+      const getUTCTimeForLocalTime = (
+        year: number,
+        month: number,
+        day: number,
+        hour: number,
+        minute: number,
+        second: number,
+        tz: string
+      ): number => {
+        // 해당 시간을 UTC로 해석 (임시)
+        const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
+        const utcDate = new Date(utcGuess);
+
+        // 이 UTC 시간을 해당 시간대로 표시했을 때의 값
+        const formatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: tz,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+
+        const parts = formatter.formatToParts(utcDate);
+        const tzYear = parseInt(parts.find((p) => p.type === "year")!.value);
+        const tzMonth = parseInt(parts.find((p) => p.type === "month")!.value);
+        const tzDay = parseInt(parts.find((p) => p.type === "day")!.value);
+        const tzHour = parseInt(parts.find((p) => p.type === "hour")!.value);
+        const tzMinute = parseInt(
+          parts.find((p) => p.type === "minute")!.value
+        );
+        const tzSecond = parseInt(
+          parts.find((p) => p.type === "second")!.value
+        );
+
+        // 해당 시간대에서 표시된 시간을 UTC로 변환
+        const tzUTC = Date.UTC(
+          tzYear,
+          tzMonth - 1,
+          tzDay,
+          tzHour,
+          tzMinute,
+          tzSecond
+        );
+
+        // 오프셋 = 원래 UTC 추정값 - 실제 해당 시간대 시간의 UTC 값
+        const offset = utcGuess - tzUTC;
+
+        // 원하는 해당 시간대의 시간을 UTC로 변환
+        return utcGuess - offset;
+      };
+
+      // 크리스마스 00:00:00을 해당 시간대 기준으로 UTC 밀리초로 계산
+      const christmasUTC = getUTCTimeForLocalTime(
+        christmasYear,
+        12,
+        25,
+        0,
+        0,
+        0,
+        timeZone
+      );
+
+      // 현재 시간을 해당 시간대 기준으로 UTC 밀리초로 계산
+      const nowUTC = getUTCTimeForLocalTime(
+        currentYear,
+        currentMonth,
+        currentDate,
+        currentHour,
+        currentMinute,
+        currentSecond,
+        timeZone
+      );
+
+      const difference: number = christmasUTC - nowUTC;
 
       setTimeLeft({
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -42,7 +177,7 @@ const ChristmasCountdown = () => {
     calculateTimeLeft();
     const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [locale]);
 
   const handleShare = async () => {
     try {
@@ -143,40 +278,48 @@ const ChristmasCountdown = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
-              <div className="text-5xl md:text-6xl font-bold text-white">
-                {timeLeft.days}
-              </div>
-              <div className="text-lg md:text-xl text-white/80">
-                {t("countdown.days")}
+          {isDday ? (
+            <div className="bg-white/10 backdrop-blur-md p-8 md:p-12 rounded-2xl shadow-lg">
+              <div className="text-6xl md:text-8xl font-bold text-white">
+                {t("countdown.dday")}
               </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
-              <div className="text-5xl md:text-6xl font-bold text-white">
-                {timeLeft.hours}
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
+                <div className="text-5xl md:text-6xl font-bold text-white">
+                  {timeLeft.days}
+                </div>
+                <div className="text-lg md:text-xl text-white/80">
+                  {t("countdown.days")}
+                </div>
               </div>
-              <div className="text-lg md:text-xl text-white/80">
-                {t("countdown.hours")}
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
+                <div className="text-5xl md:text-6xl font-bold text-white">
+                  {timeLeft.hours}
+                </div>
+                <div className="text-lg md:text-xl text-white/80">
+                  {t("countdown.hours")}
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
+                <div className="text-5xl md:text-6xl font-bold text-white">
+                  {timeLeft.minutes}
+                </div>
+                <div className="text-lg md:text-xl text-white/80">
+                  {t("countdown.minutes")}
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
+                <div className="text-5xl md:text-6xl font-bold text-white">
+                  {timeLeft.seconds}
+                </div>
+                <div className="text-lg md:text-xl text-white/80">
+                  {t("countdown.seconds")}
+                </div>
               </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
-              <div className="text-5xl md:text-6xl font-bold text-white">
-                {timeLeft.minutes}
-              </div>
-              <div className="text-lg md:text-xl text-white/80">
-                {t("countdown.minutes")}
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
-              <div className="text-5xl md:text-6xl font-bold text-white">
-                {timeLeft.seconds}
-              </div>
-              <div className="text-lg md:text-xl text-white/80">
-                {t("countdown.seconds")}
-              </div>
-            </div>
-          </div>
+          )}
 
           <button
             onClick={handleShare}
