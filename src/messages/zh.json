@@ -10,7 +10,8 @@
       "hours": "小时",
       "minutes": "分钟",
       "seconds": "秒",
-      "userPrefix": "{name}的"
+      "userPrefix": "{name}的",
+      "dday": "D-DAY"
     },
     "share": {
       "button": "分享",

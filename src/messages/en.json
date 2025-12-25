@@ -10,7 +10,8 @@
       "hours": "hours",
       "minutes": "minutes",
       "seconds": "seconds",
-      "userPrefix": "{name}'s "
+      "userPrefix": "{name}'s ",
+      "dday": "D-DAY"
     },
     "share": {
       "button": "Share",

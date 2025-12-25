@@ -10,7 +10,8 @@
       "hours": "시간",
       "minutes": "분",
       "seconds": "초",
-      "userPrefix": "{name}님의 "
+      "userPrefix": "{name}님의 ",
+      "dday": "D-DAY"
     },
     "share": {
       "button": "공유하기",
